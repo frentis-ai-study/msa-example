@@ -31,9 +31,8 @@ public class Order {
             throw new IllegalStateException("재고가 부족합니다. 현재 재고: " + inventory.getStock());
         }
 
-        // 3. 재고 감소
+        // 3. 재고 감소 (JPA dirty checking으로 자동 업데이트됨)
         inventory.setStock(inventory.getStock() - this.qty);
-        inventoryRepository.save(inventory);
     }
 
     @PostPersist
