@@ -6,6 +6,7 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "shop-order")
+@EntityListeners(OrderEntityListener.class)
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
