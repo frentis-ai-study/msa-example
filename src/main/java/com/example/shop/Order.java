@@ -18,12 +18,12 @@ public class Order {
 
     @PrePersist
     public void prePersist() {
-        // Spring Context에서 서비스 빈 가져오기
-        InventoryService inventoryService = ApplicationContextProvider.getBean(InventoryService.class);
+        // Spring Context에서 Repository 빈 가져오기
+        InventoryRepository inventoryRepository = ApplicationContextProvider.getBean(InventoryRepository.class);
 
         // 1. 재고 조회 및 검증
         Long productId = Long.parseLong(this.productId);
-        Inventory inventory = inventoryService.findById(productId)
+        Inventory inventory = inventoryRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다: " + productId));
 
         // 2. 재고 충분 여부 확인
@@ -33,13 +33,13 @@ public class Order {
 
         // 3. 재고 감소
         inventory.setStock(inventory.getStock() - this.qty);
-        inventoryService.save(inventory);
+        inventoryRepository.save(inventory);
     }
 
     @PostPersist
     public void postPersist() {
-        // Spring Context에서 서비스 빈 가져오기
-        DeliveryService deliveryService = ApplicationContextProvider.getBean(DeliveryService.class);
+        // Spring Context에서 Repository 빈 가져오기
+        DeliveryRepository deliveryRepository = ApplicationContextProvider.getBean(DeliveryRepository.class);
 
         // 4. 배송 건 생성
         Delivery delivery = new Delivery();
@@ -48,6 +48,6 @@ public class Order {
         delivery.setQty(this.qty);
         delivery.setAddress(this.address);
         delivery.setStatus("PENDING");
-        deliveryService.save(delivery);
+        deliveryRepository.save(delivery);
     }
 }
