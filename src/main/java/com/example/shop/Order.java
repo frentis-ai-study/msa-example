@@ -16,10 +16,11 @@ public class Order {
     private String address;
     private String status;
 
-    @PrePersist
-    public void prePersist() {
+    @PostPersist
+    public void postPersist() {
         // Spring Context에서 Repository 빈 가져오기
         InventoryRepository inventoryRepository = ApplicationContextProvider.getBean(InventoryRepository.class);
+        DeliveryRepository deliveryRepository = ApplicationContextProvider.getBean(DeliveryRepository.class);
 
         // 1. 재고 조회 및 검증
         Long productId = Long.parseLong(this.productId);
@@ -31,14 +32,9 @@ public class Order {
             throw new IllegalStateException("재고가 부족합니다. 현재 재고: " + inventory.getStock());
         }
 
-        // 3. 재고 감소 (JPA dirty checking으로 자동 업데이트됨)
+        // 3. 재고 감소
         inventory.setStock(inventory.getStock() - this.qty);
-    }
-
-    @PostPersist
-    public void postPersist() {
-        // Spring Context에서 Repository 빈 가져오기
-        DeliveryRepository deliveryRepository = ApplicationContextProvider.getBean(DeliveryRepository.class);
+        inventoryRepository.save(inventory);
 
         // 4. 배송 건 생성
         Delivery delivery = new Delivery();
