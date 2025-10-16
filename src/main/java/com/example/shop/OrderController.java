@@ -29,10 +29,10 @@ public class OrderController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
     }
 
-    /** POST /orders - 주문 생성 */
+    /** POST /orders - 주문 생성 (재고 감소 및 배송 건 생성) */
     @PostMapping
     public ResponseEntity<Order> createOrder(@RequestBody Order order) {
-        Order saved = orderService.save(order);
+        Order saved = orderService.createOrder(order);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
@@ -43,7 +43,7 @@ public class OrderController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
         }
         order.setId(id);
-        return orderService.save(order);
+        return orderService.updateOrder(order);
     }
 
     /** DELETE /orders/{id} - 주문 삭제 */
